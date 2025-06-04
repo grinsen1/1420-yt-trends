@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Trends Dashboard - Yota Analytics</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Подключаем шрифт Euclid Circular A -->
+    <link href="https://db.onlinewebfonts.com/c/51ba3b342959eacf8d83dcbfc38bef55?family=Euclid+Circular+A" rel="stylesheet">
+    <style>
+        @import url(//db.onlinewebfonts.com/c/51ba3b342959eacf8d83dcbfc38bef55?family=Euclid+Circular+A);
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <h1>📺 YouTube Trends Dashboard</h1>
+            <p class="subtitle">Анализ трендовых видео для аудитории 14-20 лет</p>
+        </header>
+
+        <!-- API Configuration -->
+        <section class="api-config card">
+            <div class="card__body">
+                <h2>⚙️ Конфигурация API</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="youtube-api-key">YouTube API Key</label>
+                        <input type="password" 
+                               id="youtube-api-key" 
+                               class="form-control" 
+                               value="AIzaSyBVlZTiCSa49FxG4-FcETUV11rK9IqN774"
+                               placeholder="Введите ваш YouTube API ключ">
+                        <div class="api-status" id="youtube-api-status">✅ API ключ введен</div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="openrouter-key">OpenRouter API Key</label>
+                        <input type="password" 
+                               id="openrouter-key" 
+                               class="form-control" 
+                               value="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"
+                               placeholder="Введите ваш OpenRouter API ключ">
+                        <div class="api-status" id="openrouter-api-status">✅ API ключ введен</div>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="ai-model">AI Модель</label>
+                        <select id="ai-model" class="form-control">
+                            <option value="deepseek/deepseek-r1-0528:free" selected>deepseek/deepseek-r1-0528:free</option>
+                            <option value="openai/gpt-3.5-turbo">openai/gpt-3.5-turbo</option>
+                            <option value="anthropic/claude-3-haiku">anthropic/claude-3-haiku</option>
+                        </select>
+                    </div>
+                    <div class="form-actions">
+                        <button id="load-videos-btn" class="btn btn--primary">
+                            <span class="btn-text">Загрузить данные</span>
+                            <span class="btn-icon">📥</span>
+                        </button>
+                        <a href="#" id="check-api-link" class="link-secondary">Проверить API-запрос</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Analytics Section -->
+        <section class="analytics-section">
+            <div class="analytics-header">
+                <h2>📊 Анализ привлекательности для аудитории 14-20 лет</h2>
+                <div class="analytics-actions">
+                    <a href="#" id="methodology-link" class="link-secondary">📖 Методика расчета привлекательности</a>
+                    <button id="analyze-all-btn" class="btn btn--secondary" disabled>
+                        <span class="btn-text">Проанализировать все видео</span>
+                        <span class="btn-icon">🧠</span>
+                    </button>
+                </div>
+            </div>
+            <div id="mass-analysis-progress" class="progress-container hidden">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+                <div class="progress-text" id="progress-text">Анализ: 0/20</div>
+            </div>
+        </section>
+
+        <!-- Error Container -->
+        <div id="error-container" class="error-container hidden"></div>
+
+        <!-- Videos Grid -->
+        <section id="videos-section" class="videos-section hidden">
+            <h2>🎬 Трендовые видео России</h2>
+            <div id="videos-grid" class="videos-grid"></div>
+        </section>
+
+        <!-- Loading Spinner -->
+        <div id="loading-spinner" class="loading-spinner hidden">
+            <div class="spinner"></div>
+            <p>Загружаем трендовые видео...</p>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <!-- Methodology Modal -->
+    <div id="methodology-modal" class="modal hidden">
+        <div class="modal-overlay" id="methodology-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📖 Методика расчета привлекательности для аудитории 14-20 лет</h3>
+                <button class="modal-close" id="methodology-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <h4>Базовая формула</h4>
+                <div class="formula">
+                    Привлекательность = 50% + (коэффициенты влияния)
+                </div>
+                
+                <h4>Факторы влияния для аудитории 14-20 лет</h4>
+                <ul>
+                    <li><strong>Игровая тематика:</strong> (+35%)</li>
+                    <li><strong>Челленджи и тренды:</strong> (+35%)</li>
+                    <li><strong>Музыкальный контент:</strong> (+30%)</li>
+                    <li><strong>Влоги:</strong> (+30%)</li>
+                    <li><strong>Развлекательный контент:</strong> (+25%)</li>
+                    <li><strong>Шорты:</strong> (+20%)</li>
+                    <li><strong>Молодой креатор:</strong> (+15%)</li>
+                    <li><strong>Интерактивность:</strong> (+10%)</li>
+                </ul>
+
+                <h4>Критерии AI-анализа для аудитории 14-20 лет</h4>
+                <ol>
+                    <li>Визуальная привлекательность (яркость, динамичность, мемы)</li>
+                    <li>Актуальные тренды и челленджи</li>
+                    <li>Музыкальный контент (рэп, поп, танцевальная музыка)</li>
+                    <li>Игровая тематика и киберспорт</li>
+                    <li>Блогерский контент и lifestyle</li>
+                    <li>Юмор и развлекательность</li>
+                    <li>Социальные сети и интернет-культура</li>
+                    <li>Образовательный контент в развлекательной форме</li>
+                    <li>Интерактивность и участие аудитории</li>
+                    <li>Аутентичность и близость к молодежи</li>
+                </ol>
+                
+                <h4>⚠️ Важное изменение</h4>
+                <p><strong>AI-анализ теперь фокусируется конкретно на аудитории 14-20 лет!</strong></p>
+                <p><strong>Ограничение токенов полностью убрано!</strong> Теперь OpenRouter API может возвращать полные развернутые ответы без ограничений по длине.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- API Check Modal -->
+    <div id="api-check-modal" class="modal hidden">
+        <div class="modal-overlay" id="api-check-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>🔍 Проверка API-запроса</h3>
+                <button class="modal-close" id="api-check-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <h4>YouTube API Endpoint</h4>
+                <div class="code-block" id="api-url-display"></div>
+                <p class="help-text">Скопируйте этот URL в браузер для проверки ответа API</p>
+                
+                <h4>OpenRouter API запрос (БЕЗ max_tokens)</h4>
+                <div class="code-block">
+{
+  "model": "deepseek/deepseek-r1-0528:free",
+  "messages": [{"role": "user", "content": "prompt"}],
+  "temperature": 0.7
+}
+                </div>
+                <p class="help-text">Параметр max_tokens полностью удален из всех запросов!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Analysis Results Modal -->
+    <div id="ai-results-modal" class="modal hidden">
+        <div class="modal-overlay" id="ai-results-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>🧠 Результаты анализа для аудитории 14-20 лет</h3>
+                <button class="modal-close" id="ai-results-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="ai-results-content"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
